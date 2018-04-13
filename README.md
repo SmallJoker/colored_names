@@ -3,7 +3,8 @@
 ## Description
 
 ![Screenshot](https://raw.githubusercontent.com/SmallJoker/colored_names/master/screenshot.png)
-This client mod colorizes the nicknames in-game, so communicating gets easier, even when many people are chatting with each other.
+
+This client mod colorizes the nicknames in-game, so communicating gets easier, even when many people are chatting with each other. On some servers with special chatting mods it may not detect the messages correctly or conflict with their formatting.
 
 License: MIT
 
