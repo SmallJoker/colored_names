@@ -8,6 +8,10 @@ core.register_on_receiving_chat_message(function(line)
 		myname_l = minetest.localplayer:get_name():lower()
 	end
 
+	-- Strip the color for the name mentioning effect
+	local color, line_nc = line:match("^(\x1b%(c@#[0-9a-fA-F]+%))(.*)")
+	line = line_nc or line
+
 	local prefix
 	local chat_line = false
 	local name, message = line:match("^%<(%S+)%> (.*)")
@@ -18,11 +22,14 @@ core.register_on_receiving_chat_message(function(line)
 		prefix, name, message = line:match("^(%*+ )(%S+) (.*)")
 	end
 	if not message then
-		name, message = "", (line:match("^%s*(.*)") or line)
+		-- Skip unknown chat line
+		return
 	end
+
 	prefix = prefix or ""
 
-	if name ~= "" then
+	-- No color yet? We need color.
+	if not color then
 		local nick_color = 0
 		for i = 1, #name do
 			local c = name:sub(i, i):byte()
@@ -41,6 +48,8 @@ core.register_on_receiving_chat_message(function(line)
 			name = "<" .. name .. ">"
 		end
 		name = minetest.colorize(string.format("#%X%X%X", R, G, B), name)
+	elseif chat_line then
+		name = "<" .. name .. ">"
 	end
 
 	if (chat_line or prefix == "* ")
@@ -48,5 +57,6 @@ core.register_on_receiving_chat_message(function(line)
 		prefix = minetest.colorize("#F33", "[!] " .. prefix)
 	end
 
-	return minetest.display_chat_message(prefix .. name .. " " .. message)
+	return minetest.display_chat_message(prefix .. (color or "") ..
+		name .. " " .. message)
 end)
