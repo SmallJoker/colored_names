@@ -17,7 +17,12 @@ core.register_on_receiving_chat_message(function(line)
 
 	local prefix
 	local chat_line = false
-	local name, message = line:match("^%<(%S+)%> (.*)")
+
+	local name, color_end, message = line:match("^%<(%S+)%>%s*(" .. c_pattern .. ")%s*(.*)")
+	if not message then
+		name, message = line:match("^%<(%S+)%> (.*)")
+	end
+
 	if message then
 		-- To keep the <Name> notation
 		chat_line = true
@@ -71,5 +76,5 @@ core.register_on_receiving_chat_message(function(line)
 	end
 
 	return minetest.display_chat_message(prefix .. (color or "")
-		.. name_wrap .. " " .. minetest.strip_colors(message))
+		.. name_wrap .. (color_end or "") .. " " .. message)
 end)

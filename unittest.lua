@@ -27,10 +27,13 @@ local test_table = {
 	"<singleplayer> buzz baz",
 	"\x1b(c@#abcdef)[Admin] <singleplayer> foo bar\x1b(c@#ffffff)",
 	"\x1b(c@#FF0000)<singleplayer>\x1b(c@#ffffff) not modified",
-	"\x1b(c@#FF4444)<singleplayer> \x1b(c@#ffffff)CTF format"
+	"\x1b(c@#FF4444)<singleplayer> \x1b(c@#ffffff)CTF format",
+	"\x1b(c@#F00)<singleplayer> \x1b(c@#FFF)\x1b(c@#0F0)Somebody\x1b(c@#FFF) once told me"
 }
-
+local time = os.clock()
 for i, v in pairs(test_table) do
 	print("In:  " .. v)
 	callback(v)
 end
+local end_time = (os.clock() - time) * 1000^2 / #test_table
+print("==> " .. math.floor(end_time + 0.5) .. " μs per chat message")
