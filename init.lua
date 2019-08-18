@@ -1,3 +1,4 @@
+-- Backwards compatibility for 0.4.x
 if not core.register_on_receiving_chat_message then
 	core.register_on_receiving_chat_message = core.register_on_receiving_chat_messages
 end
@@ -21,6 +22,9 @@ core.register_on_receiving_chat_message(function(line)
 	local name, color_end, message = line:match("^%<(%S+)%>%s*(" .. c_pattern .. ")%s*(.*)")
 	if not message then
 		name, message = line:match("^%<(%S+)%> (.*)")
+		if name then
+			name = name:gsub(c_pattern, "")
+		end
 	end
 
 	if message then
@@ -49,14 +53,10 @@ core.register_on_receiving_chat_message(function(line)
 
 	-- No color yet? We need color.
 	if not color then
-		local nick_color = 0
-		for i = 1, #name do
-			local c = name:sub(i, i):byte()
-			nick_color = nick_color + c * 2^(i - 1)
-		end
-		local B = nick_color % 0x10
-		local G = math.floor((nick_color % 0x100 ) / 0x10)
-		local R = math.floor((nick_color % 0x1000) / 0x100)
+		local color = core.sha1(name, true)
+		local R = color:byte( 1) % 0x10
+		local G = color:byte(10) % 0x10
+		local B = color:byte(20) % 0x10
 		if R + G + B < 24 then
 			R = 15 - R
 			G = 15 - G
