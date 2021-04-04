@@ -3,6 +3,10 @@ minetest = core
 
 local callback
 
+function esc(msg)
+	return msg:gsub("\x1b", "\\")
+end
+
 function core.colorize(x, text)
 	return "\x1b(c@" .. x .. ")" .. text .. "\x1b(c@#ffffff)"
 end
@@ -10,7 +14,7 @@ function core.get_color_escape_sequence(x)
 	return "\x1b(c@" .. x .. ")"
 end
 function core.display_chat_message(msg)
-	print("Out: " .. msg)
+	print("Out: " .. esc(msg))
 end
 function core.register_on_receiving_chat_message(func)
 	callback = func
@@ -18,11 +22,15 @@ end
 function core.strip_colors(msg)
 	return (msg:gsub("\x1b%([bc]@[^)]+%)", ""))
 end
+function core.sha1()
+	return ("FOOBARZ"):rep(5)
+end
 
 dofile("init.lua")
 
 local test_table = {
 	"*** singleplayer joined the game",
+	"*** \x1b(T@__builtin)\x1bFsingleplayer\x1bE joined the game.\x1bE",
 	"* singleplayer needs action like a true survivor",
 	"<singleplayer> buzz baz",
 	"\x1b(c@#abcdef)[Admin] <singleplayer> foo bar\x1b(c@#ffffff)",
@@ -32,7 +40,7 @@ local test_table = {
 }
 local time = os.clock()
 for i, v in pairs(test_table) do
-	print("In:  " .. v)
+	print("\nIn:  " .. esc(v))
 	callback(v)
 end
 local end_time = (os.clock() - time) * 1000^2 / #test_table

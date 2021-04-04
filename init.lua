@@ -4,7 +4,7 @@ if not core.register_on_receiving_chat_message then
 end
 
 local color_reset = "\x1b(c@#FFF)"
-local c_pattern = "\x1b%(c@#[0-9a-fA-F]+%)"
+local c_pattern = "\x1b%(c@#?[0-9a-fA-F]+%)"
 
 core.register_on_receiving_chat_message(function(line)
 	local myname_l = "~[CAPS£"
@@ -31,6 +31,10 @@ core.register_on_receiving_chat_message(function(line)
 		-- To keep the <Name> notation
 		chat_line = true
 	else
+		-- Translated server messages, actions
+		prefix, name, message = line:match("^(.*\x1bF)([^\x1b]+)(.*)")
+	end
+	if not message then
 		-- Server messages, actions
 		prefix, name, message = line:match("^(%*+ )(%S+) (.*)")
 	end
