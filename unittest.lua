@@ -32,6 +32,7 @@ local test_table = {
 	"*** singleplayer joined the game",
 	"*** \x1b(T@__builtin)\x1bFsingleplayer\x1bE joined the game.\x1bE",
 	"* singleplayer needs action like a true survivor",
+	"\x1b(T@__builtin)Privileges of \x1bFsingleplayer\x1bE: \x1bFyou, spin, me, right, round, babe\x1bE\x1bE",
 	"<singleplayer> buzz baz",
 	"\x1b(c@#abcdef)[Admin] <singleplayer> foo bar\x1b(c@#ffffff)",
 	"\x1b(c@#FF0000)<singleplayer>\x1b(c@#ffffff) not modified",

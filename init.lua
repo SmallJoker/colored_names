@@ -5,6 +5,7 @@ end
 
 local color_reset = "\x1b(c@#FFF)"
 local c_pattern = "\x1b%(c@#?[0-9a-fA-F]+%)"
+local c_namepat = "[A-z0-9-_]+"
 
 core.register_on_receiving_chat_message(function(line)
 	local myname_l = "~[CAPS£"
@@ -19,9 +20,9 @@ core.register_on_receiving_chat_message(function(line)
 	local prefix
 	local chat_line = false
 
-	local name, color_end, message = line:match("^%<(%S+)%>%s*(" .. c_pattern .. ")%s*(.*)")
+	local name, color_end, message = line:match("^%<(" .. c_namepat .. ")%>%s*(" .. c_pattern .. ")%s*(.*)")
 	if not message then
-		name, message = line:match("^%<(%S+)%> (.*)")
+		name, message = line:match("^%<(" .. c_namepat .. ")%> (.*)")
 		if name then
 			name = name:gsub(c_pattern, "")
 		end
@@ -32,15 +33,15 @@ core.register_on_receiving_chat_message(function(line)
 		chat_line = true
 	else
 		-- Translated server messages, actions
-		prefix, name, message = line:match("^(.*\x1bF)([^\x1b]+)(.*)")
+		prefix, name, message = line:match("^(.*\x1bF)(".. c_namepat .. ")(\x1bE.*)")
 	end
 	if not message then
 		-- Server messages, actions
-		prefix, name, message = line:match("^(%*+ )(%S+) (.*)")
+		prefix, name, message = line:match("^(%*+ )(" .. c_namepat .. ") (.*)")
 	end
 	if not message then
 		-- Colored prefix
-		prefix, name, message = line:match("^(.* )%<(%S+)%> (.*)")
+		prefix, name, message = line:match("^(.* )%<(" .. c_namepat .. ")%> (.*)")
 		if color and message and prefix:len() > 0 then
 			prefix = color .. prefix .. color_reset
 			color = nil
