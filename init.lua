@@ -19,6 +19,7 @@ core.register_on_receiving_chat_message(function(line)
 
 	local prefix
 	local chat_line = false
+	local message_separator = " "
 
 	local name, color_end, message = line:match("^%<(" .. c_namepat .. ")%>%s*(" .. c_pattern .. ")%s*(.*)")
 	if not message then
@@ -34,6 +35,9 @@ core.register_on_receiving_chat_message(function(line)
 	else
 		-- Translated server messages, actions
 		prefix, name, message = line:match("^(.*\x1bF)(".. c_namepat .. ")(\x1bE.*)")
+		if message then
+			message_separator = ""
+		end
 	end
 	if not message then
 		-- Server messages, actions
@@ -81,5 +85,5 @@ core.register_on_receiving_chat_message(function(line)
 	end
 
 	return minetest.display_chat_message(prefix .. (color or "")
-		.. name_wrap .. (color_end or "") .. " " .. message)
+		.. name_wrap .. (color_end or "") .. message_separator .. message)
 end)
