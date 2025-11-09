@@ -1,5 +1,4 @@
 core = {}
-minetest = core
 
 local callback
 
@@ -37,7 +36,8 @@ local test_table = {
 	"\x1b(c@#abcdef)[Admin] <singleplayer> foo bar\x1b(c@#ffffff)",
 	"\x1b(c@#FF0000)<singleplayer>\x1b(c@#ffffff) not modified",
 	"\x1b(c@#FF4444)<singleplayer> \x1b(c@#ffffff)CTF format",
-	"\x1b(c@#F00)<singleplayer> \x1b(c@#FFF)\x1b(c@#0F0)Somebody\x1b(c@#FFF) once told me"
+	"\x1b(c@#F00)<singleplayer> \x1b(c@#FFF)\x1b(c@#0F0)Somebody\x1b(c@#FFF) once told me",
+	"singleplayer: fizzbuzz"
 }
 local time = os.clock()
 for i, v in pairs(test_table) do

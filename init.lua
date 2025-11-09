@@ -1,8 +1,3 @@
--- Backwards compatibility for 0.4.x
-if not core.register_on_receiving_chat_message then
-	core.register_on_receiving_chat_message = core.register_on_receiving_chat_messages
-end
-
 local color_reset = "\x1b(c@#FFF)"
 local c_pattern = "\x1b%(c@#?[0-9a-fA-F]+%)"
 local c_namepat = "[A-z0-9-_]+"
@@ -17,22 +12,21 @@ core.register_on_receiving_chat_message(function(line)
 	local color, line_nc = line:match("^(" .. c_pattern .. ")(.*)")
 	line = line_nc or line
 
-	local prefix
-	local chat_line = false
-	local message_separator = " "
+	local prefix                  -- Anything that comes before the player name
+	local is_chat_msg = false     -- Whether to add "<", ">" around the name
+	local message_separator = " " -- What to add between the player name and the message
 
+	-- Chat message where the color starts after "<Name>" (no space)
 	local name, color_end, message = line:match("^%<(" .. c_namepat .. ")%>%s*(" .. c_pattern .. ")%s*(.*)")
 	if not message then
 		name, message = line:match("^%<(" .. c_namepat .. ")%> (.*)")
 		if name then
 			name = name:gsub(c_pattern, "")
 		end
+		is_chat_msg = (message ~= nil)
 	end
 
-	if message then
-		-- To keep the <Name> notation
-		chat_line = true
-	else
+	if not message then
 		-- Translated server messages, actions
 		prefix, name, message = line:match("^(.*\x1bF)(".. c_namepat .. ")(\x1bE.*)")
 		if message then
@@ -46,14 +40,20 @@ core.register_on_receiving_chat_message(function(line)
 	if not message then
 		-- Colored prefix
 		prefix, name, message = line:match("^(.* )%<(" .. c_namepat .. ")%> (.*)")
-		if color and message and prefix:len() > 0 then
+		if color and message and #prefix > 0 then
 			prefix = color .. prefix .. color_reset
 			color = nil
 		end
-		chat_line = true
+		is_chat_msg = (message ~= nil)
 	end
 	if not message then
-		-- Skip unknown chat line
+		-- "Name: Message", or IRC notation (seen on some servers)
+		name, message = line:match("^(" .. c_namepat .. "): (.*)")
+		prefix = nil
+		is_chat_msg = (message ~= nil)
+	end
+	if not message then
+		-- Skip unknown chat line: Do not manipulate.
 		return
 	end
 
@@ -71,19 +71,20 @@ core.register_on_receiving_chat_message(function(line)
 			G = 15 - G
 			B = 15 - B
 		end
-		if chat_line then
+		if is_chat_msg then
 			name_wrap = "<" .. name .. ">"
 		end
-		name_wrap = minetest.colorize(string.format("#%X%X%X", R, G, B), name_wrap)
-	elseif chat_line then
+		name_wrap = core.colorize(string.format("#%X%X%X", R, G, B), name_wrap)
+	elseif is_chat_msg then
 		name_wrap = "<" .. name .. ">"
 	end
 
-	if (chat_line or prefix == "* ") and name:lower() ~= myname_l
+	-- Highlight messages that mention the current player name
+	if (is_chat_msg or prefix == "* ") and name:lower() ~= myname_l
 			and message:lower():find(myname_l) then
-		prefix = minetest.colorize("#F33", "[!] ") .. prefix
+		prefix = core.colorize("#F33", "[!] ") .. prefix
 	end
 
-	return minetest.display_chat_message(prefix .. (color or "")
+	return core.display_chat_message(prefix .. (color or "")
 		.. name_wrap .. (color_end or "") .. message_separator .. message)
 end)
