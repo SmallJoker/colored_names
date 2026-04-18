@@ -6,6 +6,10 @@ function esc(msg)
 	return msg:gsub("\x1b", "\\")
 end
 
+function core.log(level, msg)
+	-- level is optional
+	print(("LOG: level=%s, msg=%s"):format(msg and level or "(none)", msg or level))
+end
 function core.colorize(x, text)
 	return "\x1b(c@" .. x .. ")" .. text .. "\x1b(c@#ffffff)"
 end

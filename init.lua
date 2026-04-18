@@ -88,3 +88,8 @@ core.register_on_receiving_chat_message(function(line)
 	return core.display_chat_message(prefix .. (color or "")
 		.. name_wrap .. (color_end or "") .. message_separator .. message)
 end)
+
+if not ("").split then
+	core.log("action", "[colored_names] Luanti 5.15.2 detected. Using compatibility code.")
+	getmetatable("").__index = string
+end
